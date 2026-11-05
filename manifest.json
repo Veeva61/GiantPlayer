@@ -1,6 +1,6 @@
 {
   "name": "GiantPlayer",
-  "version_number": "1.15.1",
+  "version_number": "1.0.0",
   "website_url": "",
   "description": "Makes the player twice as big (configurable)",
   "dependencies": ["LavaGang-MelonLoader-0.7.3"]
