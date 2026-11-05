@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>GiantPlayer</AssemblyName>
+    <RootNamespace>GiantPlayer</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- r2modman profile with MelonLoader and the generated Il2Cpp assemblies -->
+    <GameProfile Condition="'$(GameProfile)' == ''">$(APPDATA)\r2modmanPlus-local\BrutalistickVr\profiles\Default</GameProfile>
+    <MLDir>$(GameProfile)\MelonLoader\net6</MLDir>
+    <Il2CppDir>$(GameProfile)\MelonLoader\Il2CppAssemblies</Il2CppDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(MLDir)\MelonLoader.dll" Private="false" />
+    <Reference Include="$(MLDir)\0Harmony.dll" Private="false" />
+    <Reference Include="$(MLDir)\Il2CppInterop.Runtime.dll" Private="false" />
+    <Reference Include="$(MLDir)\Il2CppInterop.Common.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\Il2Cppmscorlib.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\Assembly-CSharp-firstpass.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\Il2CppHurricaneVR.Framework.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\UnityEngine.PhysicsModule.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\Unity.InputSystem.dll" Private="false" />
+    <Reference Include="$(Il2CppDir)\UnityEngine.AnimationModule.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- Copy the built mod straight into the profile's Mods folder -->
+  <Target Name="InstallMod" AfterTargets="Build">
+    <MakeDir Directories="$(GameProfile)\Mods\GiantPlayer" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameProfile)\Mods\GiantPlayer" />
+  </Target>
+
+</Project>
