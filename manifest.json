@@ -2,7 +2,7 @@
   "name": "GiantPlayer",
   "version_number": "1.0.0",
   "website_url": "https://github.com/Veeva61/GiantPlayer",
-  "description": "Makes the player twice as big (configurable)",
+  "description": "Become a x2 giant: body, arms and height scaled smoothly, with x10 strength, x10 health and x4 weight.",
   "dependencies": [
     "LavaGang-MelonLoader-0.7.3"
   ]
