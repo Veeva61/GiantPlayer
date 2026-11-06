@@ -54,27 +54,26 @@ namespace GiantPlayer
             return null;
         }
 
-        // ParentConstraint data of the bars, read from the scene file (source = LElbowPoint).
+        // ParentConstraint data of the wrist UI, read from the scene file.
         // The constraint does: pos = src.pos + src.rot * offset, rot = src.rot * rotOffset (no scale).
-        private static readonly Dictionary<string, (Vector3 pos, Vector3 rot)> SceneOffsets = new()
+        // MissionProgressCanvas is the kill counter on the arm: unscaled it sank into the x2 arm.
+        private static readonly Dictionary<string, (string src, Vector3 pos, Vector3 rot)> SceneOffsets = new()
         {
-            ["HealthBar"] = (new Vector3(0.05487490f, -1.66012228f, 0.44340134f), new Vector3(0f, -90f, 0f)),
-            ["SlowmoBar"] = (new Vector3(0.05487490f, -1.66912198f, 0.46640015f), new Vector3(0f, -90f, -25.37099266f)),
+            ["HealthBar"] = ("LElbowPoint", new Vector3(0.05487490f, -1.66012228f, 0.44340134f), new Vector3(0f, -90f, 0f)),
+            ["SlowmoBar"] = ("LElbowPoint", new Vector3(0.05487490f, -1.66912198f, 0.46640015f), new Vector3(0f, -90f, -25.37099266f)),
+            ["MissionProgressCanvas"] = ("RElbowPoint", new Vector3(0.13179398f, 0.01147771f, 0.03440094f), new Vector3(63.00000763f, 180f, 0f)),
         };
 
         internal static void BeforeScale(Transform rig, bool atX1)
         {
-            var stat = rig.Find("StatBars");
-            var src = FindChild(rig, "LElbowPoint");
-            if (stat == null || src == null) return;
-            for (int i = 0; i < stat.childCount; i++)
+            foreach (var kv in SceneOffsets)
             {
-                var t = stat.GetChild(i);
-                if (t == null || Bars.ContainsKey(t.Pointer)) continue;
-                if (!SceneOffsets.TryGetValue(t.name, out var o)) continue;
+                var t = FindChild(rig, kv.Key);
+                var src = FindChild(rig, kv.Value.src);
+                if (t == null || src == null || Bars.ContainsKey(t.Pointer)) continue;
                 var pc = t.GetComponent<ParentConstraint>();
                 if (pc == null) continue;
-                Bars[t.Pointer] = new Bar { T = t, Src = src, Pc = pc, Pos = o.pos, Rot = Quaternion.Euler(o.rot) };
+                Bars[t.Pointer] = new Bar { T = t, Src = src, Pc = pc, Pos = kv.Value.pos, Rot = Quaternion.Euler(kv.Value.rot) };
             }
         }
 
