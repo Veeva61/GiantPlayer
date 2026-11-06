@@ -25,7 +25,7 @@ Become a giant in **BRUTALISTICK VR**. Your whole body is scaled up (x2 by defau
 | HealthMultiplier | 10 | Damage taken is divided by this while big |
 | MassMultiplier | 4 | Body weight while big |
 | ApplyDelay | 1.0 | Seconds after level load before scaling |
-| SmoothBody | true | Interpolate body bones (removes visual jitter) |
+| InterpolateBody | false | Interpolate body and hands between physics steps (on = shakes while running) |
 | BodySolverIterationsMultiplier | 2 | Extra physics precision for the longer bones |
 | RagdollTorqueExponent | 0 | Body joint torque x Scale^this |
 

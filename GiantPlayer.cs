@@ -8,7 +8,7 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[assembly: MelonInfo(typeof(GiantPlayer.Core), "GiantPlayer", "1.0.0", "geom2543")]
+[assembly: MelonInfo(typeof(GiantPlayer.Core), "GiantPlayer", "1.0.1", "geom2543")]
 [assembly: MelonGame("Kubunautilus", "BrutalistickVR")]
 
 namespace GiantPlayer
@@ -36,8 +36,8 @@ namespace GiantPlayer
             _scale = _cat.CreateEntry("Scale", 2f, "Scale", "Player size multiplier (2 = twice as big)");
             _scaleSpeed = _cat.CreateEntry("ScaleWalkSpeed", true, "Scale walk speed", "Walk/run speed grows with size");
             _applyDelay = _cat.CreateEntry("ApplyDelay", 1.0f, "Apply delay", "Seconds to wait after a level loads before scaling");
-            _interpolate = _cat.CreateEntry("SmoothBody", true, "Smooth body",
-                "Interpolate the visible body bones between physics steps (removes small visual jitter)");
+            _interpolate = _cat.CreateEntry("InterpolateBody", false, "Interpolate body",
+                "Interpolate the visible body and hands between physics steps. Off = like the vanilla game. On makes the body lag behind the camera while running (looks like shaking)");
             _iterMul = _cat.CreateEntry("BodySolverIterationsMultiplier", 2, "Body solver iterations x",
                 "Physics solver iterations multiplier for the visible body while big (longer bones need more)");
             _torqueExp = _cat.CreateEntry("RagdollTorqueExponent", 0f, "Ragdoll torque exponent",
@@ -278,6 +278,8 @@ namespace GiantPlayer
             ScaleRagdollJoints(rig, body, r);
             SmoothBody(rig);
             CaptureBodyPose(rig);
+            try { Extras.FixPouchMags(rig); }
+            catch (Exception e) { LoggerInstance.Warning("Pouch mags: " + e.Message); }
             try { Extras.ApplyMass(body, LoggerInstance); }
             catch (Exception e) { LoggerInstance.Warning("Weight: " + e.Message); }
             try { Extras.ApplyStrength(rig, LoggerInstance); }

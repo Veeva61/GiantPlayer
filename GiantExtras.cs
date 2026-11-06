@@ -44,6 +44,7 @@ namespace GiantPlayer
         {
             Bars.Clear();
             PunchOrig.Clear();
+            MagComp.Clear();
         }
 
         private static Transform FindChild(Transform root, string name)
@@ -138,6 +139,40 @@ namespace GiantPlayer
                 punches++;
             }
             log.Msg($"Strength x{k} on {hands} hands, punch x{k} on {punches} punch components");
+        }
+
+        // ---------- Pouch magazines ----------
+        // Belt / wrist pouches spawn the magazine as a child of the pouch, which is part of the scaled rig,
+        // so it came out x2 and stayed that size in the gun. Undo the rig scale on the magazine while it
+        // still sits in the pouch (once taken out, Unity keeps its world size, which is then the normal one).
+        private static readonly Dictionary<IntPtr, float> MagComp = new();
+
+        internal static void FixMag(GameObject mag, Transform rig)
+        {
+            if (mag == null || rig == null) return;
+            var t = mag.transform;
+            if (!t.IsChildOf(rig)) return;
+            float done = MagComp.TryGetValue(mag.Pointer, out var c) ? c : 1f;
+            float now = Core.Current;
+            if (Mathf.Approximately(done, now)) return;
+            t.localScale = t.localScale * (done / now);
+            MagComp[mag.Pointer] = now;
+        }
+
+        internal static void FixPouchMags(Transform rig)
+        {
+            foreach (var p in rig.GetComponentsInChildren<SpawnMagOnSocketGrab>(true))
+                if (p != null) FixMag(p.currentlySpawnedMag, rig);
+            foreach (var p in rig.GetComponentsInChildren<WristPouchManager>(true))
+                if (p != null) FixMag(p.currentlySpawnedAmmo, rig);
+        }
+
+        internal static Transform RigOf(Component c)
+        {
+            var b = Core.Body;
+            if (b == null || c == null) return null;
+            var rig = b.transform.parent != null ? b.transform.parent : b.transform;
+            return c.transform.IsChildOf(rig) ? rig : null;
         }
 
         // ---------- Weight ----------
@@ -238,5 +273,23 @@ namespace GiantPlayer
     internal static class RespawnPatch
     {
         private static void Postfix() => Core.Instance?.RepairAfterRespawn();
+    }
+
+    [HarmonyPatch(typeof(SpawnMagOnSocketGrab), "TrySpawningMag")]
+    internal static class PouchMagPatch
+    {
+        private static void Postfix(SpawnMagOnSocketGrab __instance)
+        {
+            try { var rig = Extras.RigOf(__instance); if (rig != null) Extras.FixMag(__instance.currentlySpawnedMag, rig); } catch { }
+        }
+    }
+
+    [HarmonyPatch(typeof(WristPouchManager), "TrySpawningMag")]
+    internal static class WristMagPatch
+    {
+        private static void Postfix(WristPouchManager __instance)
+        {
+            try { var rig = Extras.RigOf(__instance); if (rig != null) Extras.FixMag(__instance.currentlySpawnedAmmo, rig); } catch { }
+        }
     }
 }
