@@ -8,7 +8,7 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[assembly: MelonInfo(typeof(GiantPlayer.Core), "GiantPlayer", "1.0.2", "geom2543")]
+[assembly: MelonInfo(typeof(GiantPlayer.Core), "GiantPlayer", "1.0.1", "geom2543")]
 [assembly: MelonGame("Kubunautilus", "BrutalistickVR")]
 
 namespace GiantPlayer
