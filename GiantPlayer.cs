@@ -8,7 +8,7 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[assembly: MelonInfo(typeof(GiantPlayer.Core), "GiantPlayer", "1.0.1", "geom2543")]
+[assembly: MelonInfo(typeof(GiantPlayer.Core), "GiantPlayer", "1.0.2", "geom2543")]
 [assembly: MelonGame("Kubunautilus", "BrutalistickVR")]
 
 namespace GiantPlayer
@@ -492,10 +492,17 @@ namespace GiantPlayer
             if (_cooldown > 0f) { _cooldown -= dt; return; }
             // 0.08 m at x2. Healthy play stays ~0.01-0.05; after a recenter the body sat at 0.1-0.18 forever.
             float limit = 0.04f * Current;
+            // Running and fast arm swings stretch the arm joints too (they lag behind the body) and the reset
+            // then twitched the elbows. A broken body stays stretched when you stand still, so only watch then.
+            var b = Body;
+            if (b == null || b.Pelvis == null) return;
+            Vector3 v = b.Pelvis.linearVelocity;
+            v.y = 0f;
+            if (v.magnitude > 0.6f * Current) { _badTime = 0f; return; }
             float m;
             try { m = MaxLockedStretch(); } catch { return; }
             _badTime = m > limit ? _badTime + dt : 0f;
-            if (_badTime > 0.75f) ResetBodyPose($"arm joints pulled apart by {m:F2} m");
+            if (_badTime > 1.5f) ResetBodyPose($"arm joints pulled apart by {m:F2} m");
         }
 
         // Called after the game's own respawn resolver re-enabled the body joints.
